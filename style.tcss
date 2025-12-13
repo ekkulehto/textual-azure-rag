@@ -1,0 +1,21 @@
+Screen {
+    layout: vertical;
+    align: center middle;
+}
+
+#logo {
+    content-align: center middle;
+}
+
+UserTextArea {
+    max-height: 5;
+    align: center middle;
+}
+
+#input {
+    width: 80%;
+}
+
+.started #logo {
+    display: None;
+}
