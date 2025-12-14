@@ -45,11 +45,13 @@ class InputArea(Container):
         )
 
 
-class GymRAG(App):
+class GymRag(App):
     CSS_PATH = "style.tcss"
 
     def on_mount(self) -> None:
         """Run when the app starts."""
+        self.title = 'GYMRAG'
+
         self.client = AzureOpenAI(
             azure_endpoint=AZURE_ENDPOINT,
             api_key=AZURE_OPENAI_API_KEY,
@@ -174,5 +176,5 @@ class GymRAG(App):
 
 
 if __name__ == "__main__":
-    app = GymRAG()
+    app = GymRag()
     app.run()
