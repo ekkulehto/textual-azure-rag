@@ -1,21 +1,47 @@
 Screen {
-    layout: vertical;
     align: center middle;
+}
+
+ChatContainer {
+    display: none;
+}
+
+.first_message_sent ChatContainer {
+    display: block;
 }
 
 #logo {
-    content-align: center middle;
+    width: 100%;
+    margin-bottom: 1;
 }
 
-UserTextArea {
-    max-height: 5;
+.first_message_sent #logo {
+    display: none;
+}
+
+InputArea {
     align: center middle;
+    height: 5;
 }
 
-#input {
-    width: 80%;
+.first_message_sent InputArea {
+    align: center bottom;
+    margin-bottom: 2;
 }
 
-.started #logo {
-    display: None;
+#prompt {
+    max-width: 80%;
+}
+
+ChatContainer {
+    height: 1fr;
+}
+
+.user {
+    padding: 2 2;
+    margin: 0 2;
+    border: wide $primary;
+    color: white;
+    background: $boost;
+    height: auto;
 }
