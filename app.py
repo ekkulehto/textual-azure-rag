@@ -6,7 +6,7 @@ from openai import AzureOpenAI
 from textual.app import App, ComposeResult
 from textual.containers import Container, VerticalScroll
 from textual.widgets import Input, Markdown, Header
-
+from textual import work
 
 from rag_system_prompt import RAG_SYSTEM_PROMPT
 
@@ -98,6 +98,79 @@ class GymRAG(App):
 
         chat_container.scroll_end()
 
+        # Return same container to function
+        self.get_ai_streaming_response(chat_container)
+
+    @work(thread=True)
+    def get_ai_streaming_response(self, chat_container: VerticalScroll) -> None:
+        """Fetches the response from Azure with RAG, streaming."""
+
+        ai_message_widget = ChatMessage("", classes="message assistant")
+        
+        # Mount straight to scrollable container
+        self.call_from_thread(chat_container.mount, ai_message_widget)
+
+        full_response_text = ""
+
+        try:
+            response = self.client.chat.completions.create(
+                model=DEPLOYMENT_NAME,
+                messages=self.conversation_history,
+                max_tokens=13107,
+                temperature=0.7,
+                top_p=0.95,
+                frequency_penalty=0,
+                presence_penalty=0,
+                stream=True,
+                extra_body={
+                    "data_sources": [
+                        {
+                            "type": "azure_search",
+                            "parameters": {
+                                "endpoint": SEARCH_ENDPOINT,
+                                "index_name": SEARCH_INDEX_NAME,
+                                "semantic_configuration": SEMANTIC_CONFIGURATION_NAME,
+                                "query_type": "semantic",
+                                "fields_mapping": {},
+                                "in_scope": True,
+                                "filter": None,
+                                "strictness": 3,
+                                "top_n_documents": 5,
+                                "authentication": {
+                                    "type": "api_key",
+                                    "key": SEARCH_KEY,
+                                },
+                            },
+                        }
+                    ]
+                }
+            )
+
+            for update in response:
+                if not update.choices:
+                    continue
+
+                delta = update.choices[0].delta
+                chunk = getattr(delta, "content", None)
+                if not chunk:
+                    continue
+
+                full_response_text += chunk
+
+                self.call_from_thread(
+                    ai_message_widget.update_text,
+                    full_response_text,
+                )
+                # Scroll the same container
+                self.call_from_thread(chat_container.scroll_end)
+
+            self.conversation_history.append(
+                {"role": "assistant", "content": full_response_text}
+            )
+
+        except Exception as e:
+            error_msg = f"❌ Error: {e}"
+            self.call_from_thread(ai_message_widget.update_text, error_msg)
 
 
 if __name__ == "__main__":
