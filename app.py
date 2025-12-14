@@ -72,6 +72,32 @@ class GymRAG(App):
         yield FigletWidget("GymRAG", font="ansi_regular", id="logo")
         yield InputArea(id="input-area")
 
+    async def on_input_submitted(self, event: Input.Submitted) -> None:
+        """User pressed Enter in the input field."""
+
+        user_input = event.value.strip()
+        if not user_input:
+            return
+        
+        if not self.first_message_sent:
+            self.first_message_sent = True
+            self.screen.add_class("first_message_sent")
+
+        event.input.value = ""
+
+        chat_container = self.query_one("#chat-container", ChatContainer)
+        
+        # Mount the message to VerticalScroll
+        chat_container.mount(
+            ChatMessage(user_input, classes="message user")
+        )
+
+        self.conversation_history.append(
+            {"role": "user", "content": user_input}
+        )
+
+        chat_container.scroll_end()
+
 
 
 if __name__ == "__main__":
