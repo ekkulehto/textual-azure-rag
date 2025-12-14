@@ -33,6 +33,10 @@ InputArea {
     max-width: 80%;
 }
 
+ChatMessage > * {
+    margin: 0;
+}
+
 ChatContainer {
     height: 1fr;
 }
@@ -43,5 +47,14 @@ ChatContainer {
     border: wide $primary;
     color: white;
     background: $boost;
+    height: auto;
+}
+
+.assistant {
+    padding: 2 2;
+    margin: 0 2;
+    border: wide $panel;
+    color: white;
+    background: $surface;
     height: auto;
 }
